@@ -6,7 +6,7 @@ class Base(DeclarativeBase):
     """Clase base declarativa para todas las entidades ORM."""
 
 
-# Tabla asociativa N:M (debe ir antes de ProductoModel)
+# Tabla asociativa N:M
 producto_etiqueta = Table(
     "producto_etiqueta",
     Base.metadata,
@@ -25,8 +25,9 @@ class CategoriaModel(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
 
+    # AQUÍ ESTÁ EL ÚNICO CAMBIO: agregamos cascade="all, delete-orphan"
     productos: Mapped[list["ProductoModel"]] = relationship(
-        "ProductoModel", back_populates="categoria"
+        "ProductoModel", back_populates="categoria", cascade="all, delete-orphan"
     )
 
 
@@ -44,7 +45,6 @@ class ProductoModel(Base):
         "CategoriaModel", back_populates="productos"
     )
 
-    # Relación N:M hacia EtiquetaModel mediante la tabla asociativa
     etiquetas: Mapped[list["EtiquetaModel"]] = relationship(
         "EtiquetaModel", secondary=producto_etiqueta, back_populates="productos"
     )
